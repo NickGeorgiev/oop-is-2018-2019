@@ -1,1 +1,1 @@
-# oop-is-2018-2019
+# Sample code from the seminars in FMI
