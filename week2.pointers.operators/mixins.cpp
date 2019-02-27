@@ -156,6 +156,7 @@ void executeTestsWithoutLambda(){
     result.print();
 }
 
+//offtopic
 void executeTestsWithLambda() {
     std::cout << "StudentsGroup tests w/ lambda:" << std::endl;
     Student sts[10];
