@@ -4,7 +4,11 @@
 
 //we will use 
 class Student;
+//predicate type function in the filter method below
 using predicate = bool (*) (const Student&);
+
+//mapping function in the mapOperation below
+using mapper = void (*) (Student&);
 
 
 class Student{
@@ -103,12 +107,18 @@ class StudentsGroup {
     //we filter our group to find all students that match the provided predicate "p" and return new group only with them
     StudentsGroup filter(predicate p) {
         StudentsGroup filteredStudents;
-        for(int i=0;i<size;i++) {
+        for(int i=0; i<size;i++) {
             if (p(this->students[i])) { //the predicate is exepcted to return true/false
                 filteredStudents.addStudent(students[i]);
             }
         }
         return filteredStudents;
+    }
+
+    void mapOperation(mapper m) {
+        for (int i=0; i<size; i++) {
+            m(this->students[i]);
+        }
     }
 
     //for excercise
@@ -126,6 +136,16 @@ class StudentsGroup {
 //test bool predicate
 bool evenFacultyNumber(const Student& st) {
     return st.getFn() % 2 == 0;
+}
+
+
+//test mapper - adds 0.25 to the overal grades
+void riseGrade(Student& st) {
+    st.setGrades(st.getGrades() + 0.25);
+}
+
+void simplePrint(Student& st) {
+    st.print();
 }
 
 //helper function to initialise many test students - all have the same name
@@ -152,11 +172,21 @@ void executeTestsWithoutLambda(){
         }
     }
 
+    std::cout << "Filter the collection of students and return new one: \n";
     StudentsGroup result = group.filter(&evenFacultyNumber);
     result.print();
+
+    std::cout << "Applying an operation to the collection of students: \n";
+    group.mapOperation(&riseGrade);
+    group.print();
+
+    std::cout << "We can print the collection by defining simple mapping function that prints its param and use mapOperation method: \n";
+    group.mapOperation(&simplePrint);
+
+    std::cout<<std::endl;
 }
 
-//offtopic
+//offtopic - using lambda functions
 void executeTestsWithLambda() {
     std::cout << "StudentsGroup tests w/ lambda:" << std::endl;
     Student sts[10];
@@ -173,6 +203,7 @@ void executeTestsWithLambda() {
     StudentsGroup resultWithLambda = group.filter([](const Student& st)->bool {return st.getFn()%2 == 0;});
     resultWithLambda.print();
 
+    std::cout<<std::endl;
 }
 int main(){
     executeTestsWithoutLambda();
