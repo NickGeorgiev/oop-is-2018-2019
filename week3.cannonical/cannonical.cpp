@@ -1,15 +1,6 @@
 #include<iostream>
 #include<cstring>
 
-//we will use 
-class Student;
-//predicate type function in the filter method below
-using predicate = bool (*) (const Student&);
-
-//mapping function in the mapOperation below
-using mapper = void (*) (Student&);
-
-
 class Student{
     size_t facultyNumber;
     float avg_grades;
@@ -35,7 +26,7 @@ class Student{
     // Student() = delete; -> if we want to restrict the compiler from creating the default constructor
     // Student() = default; -> if we want to follow the compiler default behaviour for this constructor
 
-    //Simple way to implement it
+    //Simple way to implement it without initialising list
     // Student(){
     //     this->facultyNumber = 71000;
     //     this->avg_grades = 5.25;
@@ -75,6 +66,7 @@ class Student{
         }
         return *this;
     }
+
     //4 - Destructor
     // ~Student() = default;
     ~Student(){
@@ -111,6 +103,23 @@ class Student{
         std::cout << this->avg_grades << '\n';
     }
 };
+
+
+/*
+Note that when we talk about operators and created the StudentsGroup class we defined a characteristic called size that had initial value of 0
+The code is in the week2 folder. Just to recap:
+class StudentsGroup{
+    ...
+    size_t size = 0;
+    By doing this we tell the compiler to use the value 0 in case no other value is provided for the size. This result in calling the parametric contructor by the compiler
+    when the default constructor has been created for us. 
+    Right now we know what constructors are and we don't need to do that. It is equivalent to
+    StudentsGroup():size(0){
+        ...
+    }
+    That is why we won't use it in the future and instead of that we will define all our data in the constructors. This will be further discussed on our next seminar.
+}
+*/
 
 int main(){
 
