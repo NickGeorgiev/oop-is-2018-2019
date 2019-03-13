@@ -32,7 +32,7 @@ class Student{
     Student() {
         facultyNumber = 71000;
         avg_grades = 3.25;
-        name = new char[6]; // new char[strlen("Petar")+1]
+        name = new char[strlen("Petar")+1];
         strcpy(name, "Petar");
     }
 
@@ -78,6 +78,7 @@ class Student{
     }
 
     void seName(const char* newName) {
+        this->name = new char[strlen(newName)+1];
         strcpy(this->name, newName);
     }
 
@@ -93,6 +94,10 @@ int main(){
     Student st;
     st.print();
     Student st2(st);
+    st2.print();
+    st2.seName("Ivan");
+    st.print();
+    st2.print();
     // Student test("Ivan Petrov Ivanov");
 
     return 0;
