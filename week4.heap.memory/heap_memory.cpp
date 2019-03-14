@@ -78,6 +78,13 @@ class Student{
     }
 
     void seName(const char* newName) {
+        // if we use the default constructor that compiler creates for us 
+        // the pointer should have some random address as value and we will try to delete something that 
+        // does not belong to us. That's another reason to redefine the default constructor
+        if (this->name) {
+            delete [] this->name;
+        }
+
         this->name = new char[strlen(newName)+1];
         strcpy(this->name, newName);
     }
