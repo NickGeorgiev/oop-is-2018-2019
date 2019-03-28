@@ -29,9 +29,9 @@ class ArrayContainer {
     void remove(const T&);
     void print() const;
     bool member(const T&) const;
-    T find(predicate) const;
-    ArrayContainer<T> filter(predicate) const;
-    void map(mapper);
+    T find(predicate<T>) const;
+    ArrayContainer<T> filter(predicate<T>) const;
+    void map(mapper<T>);
     ArrayContainer<T> intersection(const ArrayContainer<T>&) const;
     ArrayContainer<T> complement(const ArrayContainer<T>&) const;
     ArrayContainer<T> unionWith(const ArrayContainer<T>&) const;

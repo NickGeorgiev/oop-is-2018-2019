@@ -1,31 +1,29 @@
-#include "IntArrayContainer.h"
 #include <iostream>
+#include "IntArrayContainer.h"
 
-template<typename T>
-bool ArrayContainer<T>::allocateMemory(const int& capacity) {
+bool IntArrayContainer::allocateMemory(const int& capacity) {
     this->array = new(std::nothrow) int[capacity];
     this->capacity = !this->array ? 0 : capacity;
     return this->array != nullptr;
 }
 
-template<typename T>
-ArrayContainer<T>::ArrayContainer() {
+IntArrayContainer::IntArrayContainer() {
     this->size = 0;
     this->allocateMemory(4);
 }
 
 
-ArrayContainer::ArrayContainer(const int& capacity) {
+IntArrayContainer::IntArrayContainer(const int& capacity) {
     this->size = 0;
     this->allocateMemory(capacity);
 }
 
 
-ArrayContainer::ArrayContainer(const ArrayContainer& other) {
+IntArrayContainer::IntArrayContainer(const IntArrayContainer& other) {
     copy(other);
 }
 
-ArrayContainer& ArrayContainer::operator=(const ArrayContainer& other) {
+IntArrayContainer& IntArrayContainer::operator=(const IntArrayContainer& other) {
     if (this != &other) {
         destroy();
         copy(other);
@@ -33,18 +31,18 @@ ArrayContainer& ArrayContainer::operator=(const ArrayContainer& other) {
     return *this;
 }
 
-ArrayContainer::~ArrayContainer() {
+IntArrayContainer::~IntArrayContainer() {
     destroy();
 }
 
-void ArrayContainer::destroy() {
+void IntArrayContainer::destroy() {
     delete [] array;
     this->array = nullptr;
     this->capacity = 0;
     this->size = 0;
 }
 
-void ArrayContainer::copy(const ArrayContainer& other) {
+void IntArrayContainer::copy(const IntArrayContainer& other) {
     this->size = 0;
     if (this->allocateMemory(other.capacity)) {
         this->size = other.size;
@@ -54,49 +52,53 @@ void ArrayContainer::copy(const ArrayContainer& other) {
     }
 }
 
-void ArrayContainer::resize() {
-    int* tempContainer = this->array;
-    int oldCapacity = this->capacity;
+void IntArrayContainer::resize() {
+    if (this->array) {
+        int* tempContainer = this->array;
+        int oldCapacity = this->capacity;
 
-    if (this->allocateMemory(this->capacity*2)) {
-        for(int indx = 0; indx <this->size; indx++) {
-            this->array[indx] = tempContainer[indx];
+        if (this->allocateMemory(this->capacity*2)) {
+            for(int indx = 0; indx <this->size; indx++) {
+                this->array[indx] = tempContainer[indx];
+            }
+            delete [] tempContainer;
+        } else {
+            // in case we cannot allocate memory - we need to fallback to the old container and dimensions
+            this->array = tempContainer;
+            this->capacity = oldCapacity;
         }
-        delete [] tempContainer;
-    } else {
-        // in case we cannot allocate memory - we need to fallback to the old container and dimensions
-        this->array = tempContainer;
-        this->capacity = oldCapacity;
+    } else if (this->allocateMemory(4)) {
+        this->size = 0;
     }
 
 }
 
-bool ArrayContainer::empty() const {
+bool IntArrayContainer::empty() const {
     return this->size == 0;
 }
 
-bool ArrayContainer::full() const {
+bool IntArrayContainer::full() const {
     return this->size == this->capacity;
 }
 
-void ArrayContainer::add(const int& elem) {
+void IntArrayContainer::add(const int& elem) {
     if (full()) {
         resize();
     }
     this->array[size++] = elem;
 }
 
-int ArrayContainer::count() const {
+int IntArrayContainer::count() const {
     return this->size;
 }
 
-void ArrayContainer::pop() {
+void IntArrayContainer::pop() {
     if (!empty()) {
         this->size--;
     }
 }
 
-int ArrayContainer::locate(const int& elem) const {
+int IntArrayContainer::locate(const int& elem) const {
     if (empty()) {
         return -1;
     }
@@ -107,7 +109,7 @@ int ArrayContainer::locate(const int& elem) const {
     return i < this->size ? i : -1;
 }
 
-void ArrayContainer::remove(const int& elem) {
+void IntArrayContainer::remove(const int& elem) {
     if (this->empty()) {
         return;
     }
@@ -121,20 +123,20 @@ void ArrayContainer::remove(const int& elem) {
     }
 }
 
-void ArrayContainer::print() const {
+void IntArrayContainer::print() const {
     for(int i=0; i< this->size; i++) {
         std::cout<<this->array[i] << " ";
     }
     std::cout<< std::endl;
 }
 
-bool ArrayContainer::member(const int& elem) const {
+bool IntArrayContainer::member(const int& elem) const {
     const int elementIndex = this->locate(elem);
     return elementIndex != -1;
 }
 
 //not the best solution at all
-int ArrayContainer::find(predicate p) const {
+int IntArrayContainer::find(predicate p) const {
     int dummy;
 
     if (this->empty()) {
@@ -144,13 +146,12 @@ int ArrayContainer::find(predicate p) const {
     int elemIndex = 0;
     for(;elemIndex < this->size && !p(this->array[elemIndex]); elemIndex++) {}
 
-    // assert(elemIndex < this->size);
     int foundElement = elemIndex < this->size ? this->array[elemIndex] : dummy;
     return foundElement;
 }
 
-ArrayContainer ArrayContainer::filter(predicate p) const {
-    ArrayContainer result;
+IntArrayContainer IntArrayContainer::filter(predicate p) const {
+    IntArrayContainer result;
 
     for(int i=0;i<this->size; i++) {
         if (p(this->array[i])) {
@@ -161,14 +162,14 @@ ArrayContainer ArrayContainer::filter(predicate p) const {
     return result;
 }
 
-void ArrayContainer::map(mapper m) {
+void IntArrayContainer::map(mapper m) {
     for(int i=0; i<this->size; i++) {
         m(this->array[i]);
     }
 }
 
-ArrayContainer ArrayContainer::intersection(const ArrayContainer& other) const {
-    ArrayContainer result;
+IntArrayContainer IntArrayContainer::intersection(const IntArrayContainer& other) const {
+    IntArrayContainer result;
 
     for(int i=0; i<this->size; i++) {
         if(other.member(this->array[i]) && !result.member(this->array[i])) {
@@ -179,8 +180,8 @@ ArrayContainer ArrayContainer::intersection(const ArrayContainer& other) const {
     return result;
 }
 
-ArrayContainer ArrayContainer::complement(const ArrayContainer& other) const {
-    ArrayContainer result;
+IntArrayContainer IntArrayContainer::complement(const IntArrayContainer& other) const {
+    IntArrayContainer result;
 
     for(int i=0; i<this->size; i++) {
         if(!other.member(this->array[i]) && !result.member(this->array[i])) {
@@ -191,8 +192,8 @@ ArrayContainer ArrayContainer::complement(const ArrayContainer& other) const {
     return result;
 }
 
-ArrayContainer ArrayContainer::unionWith(const ArrayContainer& other) const {
-    ArrayContainer result;
+IntArrayContainer IntArrayContainer::unionWith(const IntArrayContainer& other) const {
+    IntArrayContainer result;
 
     for(int i=0; i<this->size; i++) {
         result.add(this->array[i]);
@@ -204,24 +205,24 @@ ArrayContainer ArrayContainer::unionWith(const ArrayContainer& other) const {
     return result;
 }
 
-ArrayContainer ArrayContainer::operator+(const int& elem) const {
-    ArrayContainer result(*this);
+IntArrayContainer IntArrayContainer::operator+(const int& elem) const {
+    IntArrayContainer result(*this);
     result.add(elem);
     return result;
 }
 
-void ArrayContainer::operator+=(const int& elem) {
+void IntArrayContainer::operator+=(const int& elem) {
     this->add(elem);
 }
 
-ArrayContainer ArrayContainer::operator+(const ArrayContainer& other) const {
+IntArrayContainer IntArrayContainer::operator+(const IntArrayContainer& other) const {
     return this->unionWith(other);
 }
 
-void ArrayContainer::operator --(int) {
+void IntArrayContainer::operator --(int) {
     this->pop();
 }
 
-ArrayContainer::operator bool() const {
+IntArrayContainer::operator bool() const {
     return !this->empty();
 }

@@ -1,5 +1,5 @@
-#include "IntArrayContainer.h"
 #include<iostream>
+#include "IntArrayContainer.h"
 
 
 void logMessage(const char* message) {

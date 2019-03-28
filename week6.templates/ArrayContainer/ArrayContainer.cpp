@@ -1,48 +1,52 @@
-#include "IntArrayContainer.h"
 #include <iostream>
+#include "ArrayContainer.h"
 
-bool IntArrayContainer::allocateMemory(const int& capacity) {
+template<typename T>
+bool ArrayContainer<T>::allocateMemory(const int& capacity) {
     this->array = new(std::nothrow) int[capacity];
     this->capacity = !this->array ? 0 : capacity;
     return this->array != nullptr;
 }
 
-IntArrayContainer::IntArrayContainer() {
+template<typename T>
+ArrayContainer<T>::ArrayContainer() {
     this->size = 0;
     this->allocateMemory(4);
 }
 
-
-IntArrayContainer::IntArrayContainer(const int& capacity) {
+template<typename T>
+ArrayContainer<T>::ArrayContainer(const int& capacity) {
     this->size = 0;
     this->allocateMemory(capacity);
 }
 
-
-IntArrayContainer::IntArrayContainer(const IntArrayContainer& other) {
+template<typename T>
+ArrayContainer<T>::ArrayContainer(const ArrayContainer& other) {
     copy(other);
 }
 
-IntArrayContainer& IntArrayContainer::operator=(const IntArrayContainer& other) {
+template<typename T>
+ArrayContainer<T>& ArrayContainer<T>::operator=(const ArrayContainer& other) {
     if (this != &other) {
         destroy();
         copy(other);
     }
     return *this;
 }
-
-IntArrayContainer::~IntArrayContainer() {
+template<typename T>
+ArrayContainer<T>::~ArrayContainer() {
     destroy();
 }
-
-void IntArrayContainer::destroy() {
+template<typename T>
+void ArrayContainer<T>::destroy() {
     delete [] array;
     this->array = nullptr;
     this->capacity = 0;
     this->size = 0;
 }
 
-void IntArrayContainer::copy(const IntArrayContainer& other) {
+template<typename T>
+void ArrayContainer<T>::copy(const ArrayContainer& other) {
     this->size = 0;
     if (this->allocateMemory(other.capacity)) {
         this->size = other.size;
@@ -52,7 +56,8 @@ void IntArrayContainer::copy(const IntArrayContainer& other) {
     }
 }
 
-void IntArrayContainer::resize() {
+template<typename T>
+void ArrayContainer<T>::resize() {
     int* tempContainer = this->array;
     int oldCapacity = this->capacity;
 
@@ -69,32 +74,38 @@ void IntArrayContainer::resize() {
 
 }
 
-bool IntArrayContainer::empty() const {
+template<typename T>
+bool ArrayContainer<T>::empty() const {
     return this->size == 0;
 }
 
-bool IntArrayContainer::full() const {
+template<typename T>
+bool ArrayContainer<T>::full() const {
     return this->size == this->capacity;
 }
 
-void IntArrayContainer::add(const int& elem) {
+template<typename T>
+void ArrayContainer<T>::add(const T& elem) {
     if (full()) {
         resize();
     }
     this->array[size++] = elem;
 }
 
-int IntArrayContainer::count() const {
+template<typename T>
+int ArrayContainer<T>::count() const {
     return this->size;
 }
 
-void IntArrayContainer::pop() {
+template<typename T>
+void ArrayContainer<T>::pop() {
     if (!empty()) {
         this->size--;
     }
 }
 
-int IntArrayContainer::locate(const int& elem) const {
+template<typename T>
+int ArrayContainer<T>::locate(const T& elem) const {
     if (empty()) {
         return -1;
     }
@@ -105,7 +116,8 @@ int IntArrayContainer::locate(const int& elem) const {
     return i < this->size ? i : -1;
 }
 
-void IntArrayContainer::remove(const int& elem) {
+template<typename T>
+void ArrayContainer<T>::remove(const T& elem) {
     if (this->empty()) {
         return;
     }
@@ -119,20 +131,23 @@ void IntArrayContainer::remove(const int& elem) {
     }
 }
 
-void IntArrayContainer::print() const {
+template<typename T>
+void ArrayContainer<T>::print() const {
     for(int i=0; i< this->size; i++) {
         std::cout<<this->array[i] << " ";
     }
     std::cout<< std::endl;
 }
 
-bool IntArrayContainer::member(const int& elem) const {
+template<typename T>
+bool ArrayContainer<T>::member(const T& elem) const {
     const int elementIndex = this->locate(elem);
     return elementIndex != -1;
 }
 
 //not the best solution at all
-int IntArrayContainer::find(predicate p) const {
+template<typename T>
+T ArrayContainer<T>::find(predicate<T> p) const {
     int dummy;
 
     if (this->empty()) {
@@ -142,12 +157,14 @@ int IntArrayContainer::find(predicate p) const {
     int elemIndex = 0;
     for(;elemIndex < this->size && !p(this->array[elemIndex]); elemIndex++) {}
 
+    // assert(elemIndex < this->size);
     int foundElement = elemIndex < this->size ? this->array[elemIndex] : dummy;
     return foundElement;
 }
 
-IntArrayContainer IntArrayContainer::filter(predicate p) const {
-    IntArrayContainer result;
+template<typename T>
+ArrayContainer<T> ArrayContainer<T>::filter(predicate<T> p) const {
+    ArrayContainer result;
 
     for(int i=0;i<this->size; i++) {
         if (p(this->array[i])) {
@@ -158,14 +175,16 @@ IntArrayContainer IntArrayContainer::filter(predicate p) const {
     return result;
 }
 
-void IntArrayContainer::map(mapper m) {
+template<typename T>
+void ArrayContainer<T>::map(mapper<T> m) {
     for(int i=0; i<this->size; i++) {
         m(this->array[i]);
     }
 }
 
-IntArrayContainer IntArrayContainer::intersection(const IntArrayContainer& other) const {
-    IntArrayContainer result;
+template<typename T>
+ArrayContainer<T> ArrayContainer<T>::intersection(const ArrayContainer<T>& other) const {
+    ArrayContainer result;
 
     for(int i=0; i<this->size; i++) {
         if(other.member(this->array[i]) && !result.member(this->array[i])) {
@@ -176,8 +195,9 @@ IntArrayContainer IntArrayContainer::intersection(const IntArrayContainer& other
     return result;
 }
 
-IntArrayContainer IntArrayContainer::complement(const IntArrayContainer& other) const {
-    IntArrayContainer result;
+template<typename T>
+ArrayContainer<T> ArrayContainer<T>::complement(const ArrayContainer<T>& other) const {
+    ArrayContainer result;
 
     for(int i=0; i<this->size; i++) {
         if(!other.member(this->array[i]) && !result.member(this->array[i])) {
@@ -188,8 +208,9 @@ IntArrayContainer IntArrayContainer::complement(const IntArrayContainer& other) 
     return result;
 }
 
-IntArrayContainer IntArrayContainer::unionWith(const IntArrayContainer& other) const {
-    IntArrayContainer result;
+template<typename T>
+ArrayContainer<T> ArrayContainer<T>::unionWith(const ArrayContainer<T>& other) const {
+    ArrayContainer result;
 
     for(int i=0; i<this->size; i++) {
         result.add(this->array[i]);
@@ -201,24 +222,29 @@ IntArrayContainer IntArrayContainer::unionWith(const IntArrayContainer& other) c
     return result;
 }
 
-IntArrayContainer IntArrayContainer::operator+(const int& elem) const {
-    IntArrayContainer result(*this);
+template<typename T>
+ArrayContainer<T> ArrayContainer<T>::operator+(const T& elem) const {
+    ArrayContainer result(*this);
     result.add(elem);
     return result;
 }
 
-void IntArrayContainer::operator+=(const int& elem) {
+template<typename T>
+void ArrayContainer<T>::operator+=(const T& elem) {
     this->add(elem);
 }
 
-IntArrayContainer IntArrayContainer::operator+(const IntArrayContainer& other) const {
+template<typename T>
+ArrayContainer<T> ArrayContainer<T>::operator+(const ArrayContainer<T>& other) const {
     return this->unionWith(other);
 }
 
-void IntArrayContainer::operator --(int) {
+template<typename T>
+void ArrayContainer<T>::operator --(int) {
     this->pop();
 }
 
-IntArrayContainer::operator bool() const {
+template<typename T>
+ArrayContainer<T>::operator bool() const {
     return !this->empty();
 }
